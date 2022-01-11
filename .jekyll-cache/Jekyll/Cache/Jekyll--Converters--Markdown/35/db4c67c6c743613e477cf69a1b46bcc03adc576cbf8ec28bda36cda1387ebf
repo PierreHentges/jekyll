@@ -1,0 +1,6 @@
+I"y<p>Outliers caused by typos can profoundly distort a dataset if they generate an impossibly large or small value. The same property also makes them easy to identiy during data cleaning.</p>
+
+<p>But what if a typo in a time-series is exceptional not due to its value, but due to the time when it occurs? Such small errors can be hard to identify, especially in a time-series such as 30 years of daily pollen counts. In this post, I show an approach I used for finding the needle in a haystack - or a handful of pollen grains outside of the hayfever season.</p>
+
+<p><img src="/assets/image/pollen_data_cleaning_0.png" alt="png" /></p>
+:ET

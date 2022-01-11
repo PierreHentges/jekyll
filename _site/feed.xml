@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-11T15:11:02+00:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Pierre Hentges</title><subtitle>interests, projects, reflections</subtitle><entry><title type="html">How to find a needle in the haystack, using z-scores and Q-Q plots</title><link href="http://localhost:4000/pollen/data%20cleaning/2021/11/23/Data-cleaning-how-to-find-needle-haystack/" rel="alternate" type="text/html" title="How to find a needle in the haystack, using z-scores and Q-Q plots" /><published>2021-11-23T00:00:00+00:00</published><updated>2021-11-23T00:00:00+00:00</updated><id>http://localhost:4000/pollen/data%20cleaning/2021/11/23/Data-cleaning:how-to-find-needle-haystack</id><content type="html" xml:base="http://localhost:4000/pollen/data%20cleaning/2021/11/23/Data-cleaning-how-to-find-needle-haystack/">&lt;p&gt;Outliers caused by typos can profoundly distort a dataset if they generate an impossibly large or small value. The same property also makes them easy to identiy during data cleaning.&lt;/p&gt;
+
+&lt;p&gt;But what if a typo in a time-series is exceptional not due to its value, but due to the time when it occurs? Such small errors can be hard to identify, especially in a time-series such as 30 years of daily pollen counts. In this post, I show an approach I used for finding the needle in a haystack - or a handful of pollen grains outside of the hayfever season.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_data_cleaning_0.png&quot; alt=&quot;png&quot; /&gt;
+&lt;!-- break --&gt;&lt;/p&gt;
+
+&lt;p&gt;Plants release their pollen at quite specific times of the year. Hazel, for example, pollinates in the winter months: in 2007, hazel pollen irritated the allergy sufferers between mid-January and mid-March.&lt;/p&gt;
+
+&lt;p&gt;Of course there will be some occasional pollen grains before or after that typical time - there are always variations between seasons -, but we don’t expect to see hazel pollen in summer or autumn.&lt;/p&gt;
+
+&lt;p&gt;So how come hazel pollen was detected in August 2017, as well as October and November 2016? How plausible or implausible are these observations?&lt;/p&gt;
+
+&lt;h2 id=&quot;hazel-pollen-in-the-summer-&quot;&gt;Hazel pollen in the summer ?&lt;/h2&gt;
+&lt;p&gt;To look more closely into this, let’s visually compare the 2017 season to other hazel pollen seasons in the same decade.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_data_cleaning_1.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Here I’m adding a 30-day rolling sum (orange line) to show when the main pollen season happens, and I use a log-axis to emphasise single-digit pollen concentrations.&lt;/p&gt;
+
+&lt;p&gt;This shows more clearly how out of place the pollen grains in October and August are - in 10 seasons, this only happened once.&lt;/p&gt;
+
+&lt;p&gt;A bit of botanical knowledge is extremely helpful here: Hazel pollen is produced in &lt;a href=&quot;https://en.wikipedia.org/wiki/Catkin&quot;&gt;catkins&lt;/a&gt;, which  start their development in the summer, and mature in October-November.&lt;/p&gt;
+
+&lt;p&gt;In fact, hazel catkins usually need a cold period before they start producing pollen. So unless a strange mutation has occured in nearby hazel bushes, observations of hazel pollen in August and October are likely erroneous.&lt;/p&gt;
+
+&lt;p&gt;Even if these observations are real - perhaps months-old pollen was re-suspended in the air from leaves or old catkins that were disturbed - they are not helpful if we want to analyse and model typical hazel pollen seasons, and removing these data points is warranted.&lt;/p&gt;
+
+&lt;p&gt;Although it’s just a handful of pollen grains, in the wrong place they can seriously distort our descriptive metrics of pollen seasons.&lt;/p&gt;
+
+&lt;p&gt;A hazel pollen season usually lasts for around 60 days (if defined as the duration from the 1. until 99. percentile of a season’s pollen). So if the start of the 2017 season is determined erroneously to take place in October 2016, and the season end in August 2017, then the duration would be 10 months rather than 2. Such typos can result in grotesque outliers.&lt;/p&gt;
+
+&lt;h2 id=&quot;standard-scores&quot;&gt;standard scores&lt;/h2&gt;
+&lt;p&gt;if we knew the distrubution, we could calculate the probability of obtianing a particular z-score. In the p[resent case, we don’t care: we just want to check if the most unlikely ones are fine.&lt;/p&gt;
+
+&lt;p&gt;How can we ensure such outliers are detected? For the main 6 types of allergenic pollen in the dataset, there are 10885 daily observations, with 431762 pollen grains over 10899 days - finding handfuls of pollen grains in the wrong time of the year is about finding needles in haystacks.&lt;/p&gt;
+
+&lt;p&gt;I used an approach of identfying the pollen seasons with the least likely characteristics, and then spot-checking the individual daily observations which the season characteristics were based on to see if they are compatible with botanical knowledge.&lt;/p&gt;
+
+&lt;p&gt;After calculating a bunch of descriptive metrics for the 30 seasons in the dataset, I converted these to &lt;a href=&quot;https://statisticsbyjim.com/basics/z-score/&quot;&gt;z-scores&lt;/a&gt;, aka standard scores.&lt;/p&gt;
+
+&lt;p&gt;Each z-score tells us how many standard deviations that season metric is away from the mean of the 30 seasons. So if we look at the z-scores with the largest absolute value, we can quickly identify the most unusual ones.&lt;/p&gt;
+
+&lt;p&gt;And if the same season is unusual for several metrics, it’s worth checking if it genuinely was unusual or if something’s off.&lt;/p&gt;
+
+&lt;p&gt;These are the 20 largest z-scores:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;pollen_type&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;metric&lt;/th&gt;
+      &lt;th&gt;year&lt;/th&gt;
+      &lt;th&gt;z-score&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Alnus&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;season_total&lt;/td&gt;
+      &lt;td&gt;2016&lt;/td&gt;
+      &lt;td&gt;4.158800&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;high_pollen_days&lt;/td&gt;
+      &lt;td&gt;2016&lt;/td&gt;
+      &lt;td&gt;3.978652&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Corylus&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;median_count&lt;/td&gt;
+      &lt;td&gt;2011&lt;/td&gt;
+      &lt;td&gt;3.952323&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;moderate_pollen_days&lt;/td&gt;
+      &lt;td&gt;2018&lt;/td&gt;
+      &lt;td&gt;3.462771&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;last_pollen&lt;/td&gt;
+      &lt;td&gt;1993&lt;/td&gt;
+      &lt;td&gt;3.197012&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Alnus&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;first_pollen&lt;/td&gt;
+      &lt;td&gt;1991&lt;/td&gt;
+      &lt;td&gt;3.185730&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Corylus&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;high_pollen_days&lt;/td&gt;
+      &lt;td&gt;2011&lt;/td&gt;
+      &lt;td&gt;3.151175&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;last_pollen&lt;/td&gt;
+      &lt;td&gt;1992&lt;/td&gt;
+      &lt;td&gt;3.082012&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;tr20_end&lt;/td&gt;
+      &lt;td&gt;2008&lt;/td&gt;
+      &lt;td&gt;-3.010488&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;tr3d20_end&lt;/td&gt;
+      &lt;td&gt;2008&lt;/td&gt;
+      &lt;td&gt;-3.010488&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Betula&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;tr30&lt;/td&gt;
+      &lt;td&gt;1998&lt;/td&gt;
+      &lt;td&gt;2.855324&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;first_to_last&lt;/td&gt;
+      &lt;td&gt;2009&lt;/td&gt;
+      &lt;td&gt;-2.815287&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Corylus&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;tr30&lt;/td&gt;
+      &lt;td&gt;2018&lt;/td&gt;
+      &lt;td&gt;2.804770&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Alnus&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;peak_value&lt;/td&gt;
+      &lt;td&gt;2019&lt;/td&gt;
+      &lt;td&gt;2.796124&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Betula&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;trmov5_11_start&lt;/td&gt;
+      &lt;td&gt;1996&lt;/td&gt;
+      &lt;td&gt;2.705589&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;median_count&lt;/td&gt;
+      &lt;td&gt;2006&lt;/td&gt;
+      &lt;td&gt;2.681453&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Corylus&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;first_pollen&lt;/td&gt;
+      &lt;td&gt;1991&lt;/td&gt;
+      &lt;td&gt;2.659328&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Betula&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;season_total&lt;/td&gt;
+      &lt;td&gt;2020&lt;/td&gt;
+      &lt;td&gt;2.648397&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Alnus&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;median_count&lt;/td&gt;
+      &lt;td&gt;2016&lt;/td&gt;
+      &lt;td&gt;2.636155&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;allergy_period&lt;/td&gt;
+      &lt;td&gt;2018&lt;/td&gt;
+      &lt;td&gt;2.632686&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;According to the &lt;a href=&quot;https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule&quot;&gt;empirical rule&lt;/a&gt;, just 0.3% of z-scores should be greater than +3/-3 if the distribution is Gaussian. Pollen season metrics typically dont have a Gaussian distribution, but we can rely on &lt;a href=&quot;https://en.wikipedia.org/wiki/Chebyshev%27s_inequality&quot;&gt;Chebyshev’s inequality&lt;/a&gt; according to which at the very most 11.1% are expected to have a z-score greater than 3/-3.&lt;/p&gt;
+
+&lt;p&gt;The largest z-scores for hazel (&lt;em&gt;Corylus&lt;/em&gt;) are all linked to the 2017 season, which we’ve looked at already.&lt;/p&gt;
+
+&lt;h2 id=&quot;cleaning-birch-pollen-seasons&quot;&gt;Cleaning birch pollen seasons&lt;/h2&gt;
+&lt;p&gt;For birch (&lt;em&gt;Betula&lt;/em&gt;), the seasons 2018, 2005,1992 stand out. Let’s check them out!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_data_cleaning_2.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;2004 is a typical season - this is our ‘control’. The handful of September birch pollen grains in 1992 and 2005 are exceedingly implausible.&lt;/p&gt;
+
+&lt;p&gt;The 2018 pollen grain recorded in February is even more implausible: birch catkins only start their development in March, so they aren’t producing pollen in February.&lt;/p&gt;
+
+&lt;h2 id=&quot;cleaning-grass-pollen-seasons&quot;&gt;Cleaning grass pollen seasons&lt;/h2&gt;
+&lt;p&gt;The most unusual grass season metrics are associated with the year 2007:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;pollen_type&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;metric&lt;/th&gt;
+      &lt;th&gt;year&lt;/th&gt;
+      &lt;th&gt;z-score&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Gramineae&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;trmov5_11&lt;/td&gt;
+      &lt;td&gt;2007&lt;/td&gt;
+      &lt;td&gt;3.344516&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;duration_2p5to97p5&lt;/td&gt;
+      &lt;td&gt;2007&lt;/td&gt;
+      &lt;td&gt;3.084482&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;duration_eaaci&lt;/td&gt;
+      &lt;td&gt;2007&lt;/td&gt;
+      &lt;td&gt;2.859359&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;tr3d20_start&lt;/td&gt;
+      &lt;td&gt;2007&lt;/td&gt;
+      &lt;td&gt;-2.791684&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;tr20_start&lt;/td&gt;
+      &lt;td&gt;2007&lt;/td&gt;
+      &lt;td&gt;-2.791684&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;tr30_start&lt;/td&gt;
+      &lt;td&gt;2007&lt;/td&gt;
+      &lt;td&gt;-2.718110&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;trmov5_5&lt;/td&gt;
+      &lt;td&gt;2007&lt;/td&gt;
+      &lt;td&gt;2.703028&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;moderate_pollen_days&lt;/td&gt;
+      &lt;td&gt;1998&lt;/td&gt;
+      &lt;td&gt;2.667299&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt; &lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;start_5pc&lt;/td&gt;
+      &lt;td&gt;2007&lt;/td&gt;
+      &lt;td&gt;-2.653617&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Let’s look at the 2007 pollen concentration data in the context of nearby seasons, as well as a more detailed view of daily observations:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_data_cleaning_3.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Though it may have started a bit earlier and lasted a bit longer, the 2007 does not look fundamentally different from others, and the daily counts look fine.&lt;/p&gt;
+
+&lt;p&gt;There is no reason to suspect erroneous data - 2007 was probably just the longest season in the 1991-2020 period.&lt;/p&gt;
+
+&lt;h2 id=&quot;cleaning-alder-pollen-seasons&quot;&gt;Cleaning alder pollen seasons&lt;/h2&gt;
+&lt;p&gt;How about alder (Alnus)? The 2016 season had high z-scores for the total amount of pollen produced in the season, and the number of days with especially high pollen counts.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_data_cleaning_4.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The 2016 season was definitely unusual: the total amount of pollen produced on average (median) is below 1000, but in 2016 it nearly reached 4000 pollen grains/m³ per year.&lt;/p&gt;
+
+&lt;p&gt;But the 2016 peak concentrations aren’t unusually high - ie. not the type of outlier due to a typo.&lt;/p&gt;
+
+&lt;p&gt;In fact, it looks like in 2016 the period with days where pollen concentrations stayed relatively high was unusually long, while for the other seasons, this period is much more transient and tails off quickly.&lt;/p&gt;
+
+&lt;p&gt;So 2016 doesn’t look like an outlier that should be removed - quite the opposite, we might want to study it closely, to learn something about the factors associated with high seasonal pollen totals.&lt;/p&gt;
+
+&lt;h1 id=&quot;quantile-quantile-plots&quot;&gt;Quantile-quantile plots&lt;/h1&gt;
+
+&lt;p&gt;Quantile-quantile &lt;a href=&quot;https://en.wikipedia.org/wiki/Q%E2%80%93Q_plot&quot;&gt;(Q-Q) plots&lt;/a&gt; are a quick graphical method for comparing two distributions: if the two distributions corrrespond to each other, the quantiles from one plotted against the other will follow a 45° diagonal line (y = x).&lt;/p&gt;
+
+&lt;p&gt;Often a set of actual observations (y axis) is compared to a theoretical distribution such as the normal disrtibution (x axis).&lt;/p&gt;
+
+&lt;p&gt;Such a normal quantile plot shows how much the distribution of the observed data follow or deviates from the Gaussian.&lt;/p&gt;
+
+&lt;p&gt;A strength of normal quantile plots is that data points in the tail of the distribution are much better visualised - of course this is where we expect to find outliers.&lt;/p&gt;
+
+&lt;p&gt;I like normal quantile plots because of the intuitive understanding they give of a dataset. The central tendency, variability and skewness are instantly visualised.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_data_cleaning_85.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In the present case, I don’t necessarily care whether a pollen season metric follows a Gaussian distribution specifically, but about quickly identifying if the extreme data in a normal quantile plot look like potential outliers : do they fall close to the 45° diagonal line? If not, do they deviate in a way similar to the other observations?&lt;/p&gt;
+
+&lt;p&gt;This is quite similar to the strategy of using z-scores to identify unusual observations that are worth checking. The advantage of the normal quantile plots is that potential outliers are shown in the context of the other 29 seasons.&lt;/p&gt;
+
+&lt;p&gt;In the 4 normal quantile plots above, each has one or two data points that look unusual. From our previous inspection of the underlying pollen counts, we can be confident that only the top row (hazel season duration, birch date of last pollen) is due to erroneous pollen data. The bottom row (alder season total, grasses season duration using moving averages) are genuine data points that are unusual due to “freak events”, in this case probably unusual weather or &lt;a href=&quot;https://en.wikipedia.org/wiki/Mast_(botany)&quot;&gt;mast seeding&lt;/a&gt; years.&lt;/p&gt;
+
+&lt;p&gt;What this shows is that it is usually not enough to just look at how extreme a data point is, some domain knowledge is required to make a judgement as to which data points are unusual and which are impossible.&lt;/p&gt;
+
+&lt;h1 id=&quot;outliers-distort-outlier-detection-methods&quot;&gt;Outliers distort outlier detection methods&lt;/h1&gt;
+&lt;p&gt;What is the effect removing the implausible observations by setting the value of the pollen concentration to 0? Here are normal quantile plots for before/after cleaning (blue/red). The top row shows the actual values of the observations on the y-axis, the bottom the corresponding quantiles.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_data_cleaning_86.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For the duration of the hazel season (1-99% of APIn), cleaning corrects two extreme data points, while the other values remain the same. In the bottom row we can see how correcting the outliers impacts the shape of the whole distribution: it follow the 45° line representing the Gaussian more closely.&lt;/p&gt;
+
+&lt;p&gt;For the end of the birch season (last day of the year with birch pollen), cleaning corrects a handful of data points. Some of these end up closer to the median of the distribution, causing the cleaned distribution to shift to the right. Again, as shown in the bottom row, after data cleaning the data points follow a normal distribution much more closely.&lt;/p&gt;
+
+&lt;p&gt;The impact of the removal of erroneous pollen data on the whole distribution shows another noteworthy - and slightly ironic - phenomenon: most methods for outlier detection are themselves sensitive to the presence of outliers.&lt;/p&gt;
+
+&lt;p&gt;In other words, the presence of outliers make other data points look less unusual than they are, whether we use their z-score or their position in the context of the whole data set on a normal quantile plot.&lt;/p&gt;</content><author><name></name></author><category term="pollen" /><category term="data cleaning" /><summary type="html">Outliers caused by typos can profoundly distort a dataset if they generate an impossibly large or small value. The same property also makes them easy to identiy during data cleaning. But what if a typo in a time-series is exceptional not due to its value, but due to the time when it occurs? Such small errors can be hard to identify, especially in a time-series such as 30 years of daily pollen counts. In this post, I show an approach I used for finding the needle in a haystack - or a handful of pollen grains outside of the hayfever season.</summary></entry><entry><title type="html">What does a pollen season look like?</title><link href="http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/" rel="alternate" type="text/html" title="What does a pollen season look like?" /><published>2021-11-22T00:00:00+00:00</published><updated>2021-11-22T00:00:00+00:00</updated><id>http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons</id><content type="html" xml:base="http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/">&lt;p&gt;Plants release pollen in a &lt;a href=&quot;https://en.wikipedia.org/wiki/Phenology&quot;&gt;phenological&lt;/a&gt; process : the pollen season. As pollen allergy suffers &lt;a href=&quot;https://en.wikipedia.org/wiki/Allergen#Seasonal_allergy&quot;&gt;know&lt;/a&gt;, these seasons repeat every year in a similar way - but there is also great variability, at the level of daily observations, between seasons and between plants. This post presents ways of visualising pollen time-series data so to gain a sense of how a pollen season unfolds as well as how pollen seasons vary.&lt;/p&gt;
+
+&lt;p&gt;Pollen concentrations vary from day to day. On the left are daily observations of the concentration of birch pollen in 2006. It starts in mid-April, it fades out from mid-May. The bulk of pollen is seen in the second half of April. This is the main pollen season: people allergic to birch pollen will see strong symptoms when the concentration is above 50 or 100 pollen grains /m³.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_season_look_0.png&quot; alt=&quot;png&quot; /&gt;
+&lt;!-- break --&gt;
+But pollen concentrations are also vary from season to season. On the right are daily concentrations of 30 seasons of birch pollen. Each season happens around the same time of the year, but the day-to-day variability as well as the season-to-season variability are considerable.&lt;/p&gt;
+
+&lt;p&gt;To smooth the daily variations out, we can use rolling averages. Below are 10 randomly selected seasons, showing the rolling mean, averaged over different-sized windows.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_season_look_1.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Using a rolling average makes the visualisation less busy, and gives a better sense of the intensity of the main season, as well as the differences between seasons.&lt;/p&gt;
+
+&lt;p&gt;But if the interval over which the rolling average is calculated becomes too long, the granularity of daily observations is lost. As peak days get flattened, the coloured area is primarily a visualisation of the start and end of the seasons, as well as the amount of pollen released in total.&lt;/p&gt;
+
+&lt;p&gt;A second way of making the graph less busy is to use the cumulative sum of daily pollen concentrations. This is shown on the left for the same 10 seasons as above.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_season_look_2.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The cumulatively summing the daily observations gives an even better sense of the differences in timing between seasons, and the total pollen released each year. The granularity of daily obervations is not lost, but shown in context.&lt;/p&gt;
+
+&lt;p&gt;If we normalise the cumulative sum, we get a sense of how similar the unfolding dynamic of each season is: though each season starts at a different time, once the birch trees get going, they release a lot of pollen in a short time. With trees like birch, we usually pass fom 20% to 80% of a season’s total pollen in very few days.&lt;/p&gt;
+
+&lt;p&gt;However, even the normalised cumulative sum can be too busy if we want to look at the decades of pollen measurements in the dataset (LHS and middle panels below). So here’s one of my favourite ways of visualising pollen season : the &lt;a href=&quot;https://en.wikipedia.org/wiki/Functional_boxplot&quot;&gt;functional boxplot&lt;/a&gt; (RHS panel).&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_season_look_3.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In the functional boxplot, the thicker black curve is a ‘median’ curve that summarises all the seasons. The dark grey central region includes 50% of pollen observations.&lt;/p&gt;
+
+&lt;p&gt;Outlier seasons are shown individually. Notice something? the ‘too late’ outliers are mostly in the 90s and 0s, the ‘too early’ outliers are mostly in the 2010s. More on that another time.&lt;/p&gt;
+
+&lt;p&gt;What happens if we combine rolling means and functional boxplots? The figure below shows how a very busy visualisation of 30 years of daily grass pollen concentrations can be cleaned up, first by calculating a rolling average, normalised using the median season total.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_season_look_4.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The lower panel represents the same data as a functional boxplot, emphasising the region containing 50% of observations (grey), and outlier seasons. This is without using cumulative concentrations. It works best for grass pollen, which have quite a long, less variable season.&lt;/p&gt;
+
+&lt;p&gt;So to summarise:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;rolling averages are a good way of smoothing out daily variability ;&lt;/li&gt;
+  &lt;li&gt;cumulative sums are good for visualising the progression of a dpollen season ;&lt;/li&gt;
+  &lt;li&gt;normalisation of cumulative sums is best for comparing season progression and timing - especially in a functional boxplot.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;What if we combine all of these methods from our box of tricks?&lt;/p&gt;
+
+&lt;p&gt;Let’s first visualise all the tree pollen seasons:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_season_look_5.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;That’s daily observations of 20 species over 30 years, so 600 seasons. The daily observations vary over 3 orders of magnitude of pollen concentrations. Quite a muddle!&lt;/p&gt;
+
+&lt;p&gt;Now here’s what happens if we separate the same data by plant species, and use rolling means, cumulative normalised sums with functional boxplots.&lt;/p&gt;
+
+&lt;p&gt;This way we can visualise when each tree pollen season normally occurs, as well as the seasons that were different from that norm.i87&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/image/pollen_season_look_6.png&quot; alt=&quot;png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;And there we have it: order from chaos, an intuitive understanding of 600 tree pollen seasons, 30 years worth of observations made at a daily frequency.&lt;/p&gt;</content><author><name></name></author><category term="viz" /><category term="time-series" /><category term="pollen" /><summary type="html">Plants release pollen in a phenological process : the pollen season. As pollen allergy suffers know, these seasons repeat every year in a similar way - but there is also great variability, at the level of daily observations, between seasons and between plants. This post presents ways of visualising pollen time-series data so to gain a sense of how a pollen season unfolds as well as how pollen seasons vary. Pollen concentrations vary from day to day. On the left are daily observations of the concentration of birch pollen in 2006. It starts in mid-April, it fades out from mid-May. The bulk of pollen is seen in the second half of April. This is the main pollen season: people allergic to birch pollen will see strong symptoms when the concentration is above 50 or 100 pollen grains /m³.</summary></entry><entry><title type="html">A lockdown project that became something bigger</title><link href="http://localhost:4000/pollen/2021/11/15/Looking-at-Pollen/" rel="alternate" type="text/html" title="A lockdown project that became something bigger" /><published>2021-11-15T00:00:00+00:00</published><updated>2021-11-15T00:00:00+00:00</updated><id>http://localhost:4000/pollen/2021/11/15/Looking-at-Pollen</id><content type="html" xml:base="http://localhost:4000/pollen/2021/11/15/Looking-at-Pollen/">&lt;p&gt;I’m setting up this blog to document and reflect on some work I did on a dataset of aerobiological pollen measurements, to share methods I used and insights I gained.&lt;/p&gt;
+
+&lt;p&gt;A few weeks before last winter’s lockdown, in search for a real world dataset, mainly as an exercise for time-series analysis and visualisation as well as some predictive modelling, I started looking at data from the aerobiology station in Luxembourg (publicly available at pollen.lu).&lt;/p&gt;
+
+&lt;p&gt;It’s a great dataset, covering 30 continuous years of pollen measurements, taken at a daily frequency, of 33 different types of trees, grass and weeds. It also contains daily measurements of several types of fungal spores. The data are very clean and consistent, probably because, over the three decades, the measurements have been taken by the same team of people and the pollen trap was never moved.&lt;/p&gt;
+
+&lt;p&gt;The more I looked at the data, the more interested I got in it. Pollen research takes place at the unusual intersection of medicine (due to medical relevance of pollen allergies), botany (particularly &lt;a href=&quot;https://en.wikipedia.org/wiki/Phenology&quot;&gt;phenology&lt;/a&gt;, which studies periodic events of biological life cycles), and meteorology (because pollen concentrations are largely determined by weather conditions). 
+&lt;!-- break --&gt;
+But there’s also a link to climate change: since weather conditions influence pollen concentrations, climate change is reflected in pollen data. And therefore a 30 year-long time-series of pollen concentrations provides a detailed record of the impact climate change has had on vegetation.&lt;/p&gt;
+
+&lt;p&gt;So, when last winter’s lockdown was announced, this pollen analysis project became something bigger, as I wanted to do something useful with my time.&lt;/p&gt;
+
+&lt;p&gt;An in-depth analysis of the data has now been accepted for publication in the &lt;a href=&quot;https://ssm.lu/bulletin/&quot;&gt;Bulletin de la Société des Sciences Médicales du Grand Duché de Luxembourg&lt;/a&gt;. So this seems like the right moment to reflect on and document some of the work I’ve done for it.&lt;/p&gt;
+
+&lt;p&gt;I’m going to talk about things like cleaning of these time-series data, trend analysis, getting a handle on the variability, mast seeding.&lt;/p&gt;
+
+&lt;p&gt;It’s also very interesting from a data analysis/modelling perspective, because the data (both pollen and weather) are solid but analysis and modelling are surprsingly challenging. I learnt how to apply a number of methods, which I want to describe in this series of blog posts.&lt;/p&gt;</content><author><name></name></author><category term="pollen" /><summary type="html">I’m setting up this blog to document and reflect on some work I did on a dataset of aerobiological pollen measurements, to share methods I used and insights I gained. A few weeks before last winter’s lockdown, in search for a real world dataset, mainly as an exercise for time-series analysis and visualisation as well as some predictive modelling, I started looking at data from the aerobiology station in Luxembourg (publicly available at pollen.lu). It’s a great dataset, covering 30 continuous years of pollen measurements, taken at a daily frequency, of 33 different types of trees, grass and weeds. It also contains daily measurements of several types of fungal spores. The data are very clean and consistent, probably because, over the three decades, the measurements have been taken by the same team of people and the pollen trap was never moved. The more I looked at the data, the more interested I got in it. Pollen research takes place at the unusual intersection of medicine (due to medical relevance of pollen allergies), botany (particularly phenology, which studies periodic events of biological life cycles), and meteorology (because pollen concentrations are largely determined by weather conditions).</summary></entry></feed>
