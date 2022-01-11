@@ -134,7 +134,7 @@ A strength of normal quantile plots is that data points in the tail of the distr
 
 I like normal quantile plots because of the intuitive understanding they give of a dataset. The central tendency, variability and skewness are instantly visualised.
 
-![png]({{"/assets/image/pollen_data_cleaning_85.png"}})
+![png]({{"/assets/image/pollen_data_cleaning_5.png"}})
 
 In the present case, I don't necessarily care whether a pollen season metric follows a Gaussian distribution specifically, but about quickly identifying if the extreme data in a normal quantile plot look like potential outliers : do they fall close to the 45° diagonal line? If not, do they deviate in a way similar to the other observations?
 
@@ -147,7 +147,7 @@ What this shows is that it is usually not enough to just look at how extreme a d
 # Outliers distort outlier detection methods
 What is the effect removing the implausible observations by setting the value of the pollen concentration to 0? Here are normal quantile plots for before/after cleaning (blue/red). The top row shows the actual values of the observations on the y-axis, the bottom the corresponding quantiles.
 
-![png]({{"/assets/image/pollen_data_cleaning_86.png"}})
+![png]({{"/assets/image/pollen_data_cleaning_6.png"}})
 
 For the duration of the hazel season (1-99% of APIn), cleaning corrects two extreme data points, while the other values remain the same. In the bottom row we can see how correcting the outliers impacts the shape of the whole distribution: it follow the 45° line representing the Gaussian more closely.
 

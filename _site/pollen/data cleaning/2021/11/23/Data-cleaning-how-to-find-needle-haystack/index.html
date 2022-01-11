@@ -385,7 +385,7 @@ But what if a typo in a time-series is exceptional not due to its value, but due
 
 <p>I like normal quantile plots because of the intuitive understanding they give of a dataset. The central tendency, variability and skewness are instantly visualised.</p>
 
-<p><img src="/assets/image/pollen_data_cleaning_85.png" alt="png" /></p>
+<p><img src="/assets/image/pollen_data_cleaning_5.png" alt="png" /></p>
 
 <p>In the present case, I don’t necessarily care whether a pollen season metric follows a Gaussian distribution specifically, but about quickly identifying if the extreme data in a normal quantile plot look like potential outliers : do they fall close to the 45° diagonal line? If not, do they deviate in a way similar to the other observations?</p>
 
@@ -398,7 +398,7 @@ But what if a typo in a time-series is exceptional not due to its value, but due
 <h1 id="outliers-distort-outlier-detection-methods">Outliers distort outlier detection methods</h1>
 <p>What is the effect removing the implausible observations by setting the value of the pollen concentration to 0? Here are normal quantile plots for before/after cleaning (blue/red). The top row shows the actual values of the observations on the y-axis, the bottom the corresponding quantiles.</p>
 
-<p><img src="/assets/image/pollen_data_cleaning_86.png" alt="png" /></p>
+<p><img src="/assets/image/pollen_data_cleaning_6.png" alt="png" /></p>
 
 <p>For the duration of the hazel season (1-99% of APIn), cleaning corrects two extreme data points, while the other values remain the same. In the bottom row we can see how correcting the outliers impacts the shape of the whole distribution: it follow the 45° line representing the Gaussian more closely.</p>
 
