@@ -7,15 +7,15 @@
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0'>
 
 
-<meta name="description" content="Plants release pollen in a phenological process : the pollen season. As pollen allergy suffers know, these seasons repeat every year in a similar way - but there is also great variability, at the level of daily observations, between seasons and between plants. This post presents ways of visualising pollen time-series data so to gain a sense of how a pollen season unfolds as well as how pollen seasons vary.
+<meta name="description" content="Health care systems are both expensive to run and extremely valuable for patients. So why do so many patients miss their medical appointments?
 
-Pollen concentrations vary from day to day. On the left are daily observations of the concentration of birch pollen in 2006. It starts in mid-April, it fades out from mid-May. The bulk of pollen is seen in the second half of April. This is the main pollen season: people allergic to birch pollen will see strong symptoms when the concentration is above 50 or 100 pollen grains /m³.
+I tried to gain some preliminary insights into factors associated with no-shows using a dataset of 110k hospital appointments in Brazil. It collects information about both appointments and patient characteristics in 14 variables.
 
 
 " />
-<meta property="og:description" content="Plants release pollen in a phenological process : the pollen season. As pollen allergy suffers know, these seasons repeat every year in a similar way - but there is also great variability, at the level of daily observations, between seasons and between plants. This post presents ways of visualising pollen time-series data so to gain a sense of how a pollen season unfolds as well as how pollen seasons vary.
+<meta property="og:description" content="Health care systems are both expensive to run and extremely valuable for patients. So why do so many patients miss their medical appointments?
 
-Pollen concentrations vary from day to day. On the left are daily observations of the concentration of birch pollen in 2006. It starts in mid-April, it fades out from mid-May. The bulk of pollen is seen in the second half of April. This is the main pollen season: people allergic to birch pollen will see strong symptoms when the concentration is above 50 or 100 pollen grains /m³.
+I tried to gain some preliminary insights into factors associated with no-shows using a dataset of 110k hospital appointments in Brazil. It collects information about both appointments and patient characteristics in 14 variables.
 
 
 " />
@@ -23,12 +23,12 @@ Pollen concentrations vary from day to day. On the left are daily observations o
 <meta name="author" content="Pierre Hentges" />
 
 
-<meta property="og:title" content="What does a pollen season look like?" />
-<meta property="twitter:title" content="What does a pollen season look like?" />
+<meta property="og:title" content="Exploratory data analysis in Python: Missed hospital appointments" />
+<meta property="twitter:title" content="Exploratory data analysis in Python: Missed hospital appointments" />
 
 
 
-    <title>What does a pollen season look like? – Pierre Hentges – interests, projects, reflections</title>
+    <title>Exploratory data analysis in Python: Missed hospital appointments – Pierre Hentges – interests, projects, reflections</title>
 
     <link rel="stylesheet" type="text/css" href="/style.css"/>
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/ress/dist/ress.min.css"/>
@@ -88,87 +88,135 @@ Pollen concentrations vary from day to day. On the left are daily observations o
 
     <div id="main" role="main" class="container">
       <article class="post">
-  <h1>What does a pollen season look like?</h1>
+  <h1>Exploratory data analysis in Python: Missed hospital appointments</h1>
 
   <div class="entry">
-    <p>Plants release pollen in a <a href="https://en.wikipedia.org/wiki/Phenology">phenological</a> process : the pollen season. As pollen allergy suffers <a href="https://en.wikipedia.org/wiki/Allergen#Seasonal_allergy">know</a>, these seasons repeat every year in a similar way - but there is also great variability, at the level of daily observations, between seasons and between plants. This post presents ways of visualising pollen time-series data so to gain a sense of how a pollen season unfolds as well as how pollen seasons vary.</p>
+    <p>Health care systems are both expensive to run and extremely valuable for patients. So why do so many patients miss their medical appointments?</p>
 
-<p>Pollen concentrations vary from day to day. On the left are daily observations of the concentration of birch pollen in 2006. It starts in mid-April, it fades out from mid-May. The bulk of pollen is seen in the second half of April. This is the main pollen season: people allergic to birch pollen will see strong symptoms when the concentration is above 50 or 100 pollen grains /m³.</p>
+<p>I tried to gain some preliminary insights into factors associated with no-shows using a dataset of 110k hospital appointments in Brazil. It collects information about both appointments and patient characteristics in 14 variables.</p>
 
-<p><img src="/assets/image/pollen_season_look_0.png" alt="png" />
-<!-- break -->
-But pollen concentrations are also vary from season to season. On the right are daily concentrations of 30 seasons of birch pollen. Each season happens around the same time of the year, but the day-to-day variability as well as the season-to-season variability are considerable.</p>
+<p><img src="http://localhost:4000/assets/project_assets/noshow-hospital-appointments-screenshot.png" alt="alt" />
+<!-- break --></p>
 
-<p>To smooth the daily variations out, we can use rolling averages. Below are 10 randomly selected seasons, showing the rolling mean, averaged over different-sized windows.</p>
+<h3 id="project-purpose">Project purpose</h3>
+<p>The purpose of the project, which is a part of the <a href="https://github.com/PierreHentges/DAND">Data Analyst</a> course I did, was to learn about the data analysis process of questioning, wrangling, exploring, analyzing, and communicating data. It only aimed for preliminary observations as it did not involve statistical analysis or model building.</p>
 
-<p><img src="/assets/image/pollen_season_look_1.png" alt="png" /></p>
+<p>This was the first longer data analysis project I did using the Python libraries pandas, and matplotlib and seaborn for visualisation. It was carried out in a Juypter notebook <a href="http://localhost:4000/assets/project_assets/noshow-hospital-appointments.html"> available here</a>.</p>
 
-<p>Using a rolling average makes the visualisation less busy, and gives a better sense of the intensity of the main season, as well as the differences between seasons.</p>
+<h2 id="data-wrangling">Data wrangling</h2>
+<p>I obtained the data set <a href="https://www.kaggle.com/joniarroba/noshowappointments">from Kaggle</a> as a csv file that I read into a pandas dataframe.</p>
 
-<p>But if the interval over which the rolling average is calculated becomes too long, the granularity of daily observations is lost. As peak days get flattened, the coloured area is primarily a visualisation of the start and end of the seasons, as well as the amount of pollen released in total.</p>
+<p>It encompasses 14 variables, and a small amount of data cleaning was necessary. I converted some dates and booleans to the appropriate format, corrected some typos in variable names, and dropped one record with a negative patient age.</p>
 
-<p>A second way of making the graph less busy is to use the cumulative sum of daily pollen concentrations. This is shown on the left for the same 10 seasons as above.</p>
+<h2 id="exploratory-data-analysis-eda">Exploratory Data Analysis (EDA)</h2>
+<h3 id="approach">Approach</h3>
+<p>My analysis approach had 3 stages focussing either on the patient, on the organisation of appointments, or on the hospital where the appointment took place.</p>
 
-<p><img src="/assets/image/pollen_season_look_2.png" alt="png" /></p>
+<p>As the data set contains information on the patients’ health and socio-economic characteristics, I tried to identify if these were associated with missed appointments to find out if there was a typical profile of patients who miss their appointment.</p>
 
-<p>The cumulatively summing the daily observations gives an even better sense of the differences in timing between seasons, and the total pollen released each year. The granularity of daily obervations is not lost, but shown in context.</p>
+<p>I also tried to identify associations between no-shows and factors of how medical appointments are organised - these are of course interesting if we want to reduce the proportion of missed appointments, since organisational aspects can in principle be changed more easily than patient characteristics.</p>
 
-<p>If we normalise the cumulative sum, we get a sense of how similar the unfolding dynamic of each season is: though each season starts at a different time, once the birch trees get going, they release a lot of pollen in a short time. With trees like birch, we usually pass fom 20% to 80% of a season’s total pollen in very few days.</p>
+<p>Finally, I wanted to check if any associations I had identified held up when the data were disaggregated according to the hospital where it took place.</p>
 
-<p>However, even the normalised cumulative sum can be too busy if we want to look at the decades of pollen measurements in the dataset (LHS and middle panels below). So here’s one of my favourite ways of visualising pollen season : the <a href="https://en.wikipedia.org/wiki/Functional_boxplot">functional boxplot</a> (RHS panel).</p>
+<p>In the exploratory data analysis, I sought these trends and associations mainly through the means of visualisation, tabulation and correlation of variables.</p>
 
-<p><img src="/assets/image/pollen_season_look_3.png" alt="png" /></p>
+<h3 id="waiting-for-an-appointment">Waiting for an appointment</h3>
+<p>Overall, 20.2% of the appointments in the data set are missed. I then looked at how appointments are organised.</p>
 
-<p>In the functional boxplot, the thicker black curve is a ‘median’ curve that summarises all the seasons. The dark grey central region includes 50% of pollen observations.</p>
+<p>Both the date when the appointment was scheduled, and the date for which it was set are available, enabling calculation of how long patients need to wait for their appointment.</p>
 
-<p>Outlier seasons are shown individually. Notice something? the ‘too late’ outliers are mostly in the 90s and 0s, the ‘too early’ outliers are mostly in the 2010s. More on that another time.</p>
+<p>I divided appointments into 5 categories according to how long the patient needed to wait, and calculated the proportion of missed appointments in each category.</p>
 
-<p>What happens if we combine rolling means and functional boxplots? The figure below shows how a very busy visualisation of 30 years of daily grass pollen concentrations can be cleaned up, first by calculating a rolling average, normalised using the median season total.</p>
+<p><img src="http://localhost:4000/assets/project_assets/dand-noshows_vs_waittime.png" alt="image-right" class="align-center" /></p>
 
-<p><img src="/assets/image/pollen_season_look_4.png" alt="png" /></p>
+<p>It turns out that missed appointments are particularly low for same-day appointments at 4.64%, compared to the overall percentage of no-shows of 20.2%.  The percentage of no-shows then rises as the wait time increases.</p>
 
-<p>The lower panel represents the same data as a functional boxplot, emphasising the region containing 50% of observations (grey), and outlier seasons. This is without using cumulative concentrations. It works best for grass pollen, which have quite a long, less variable season.</p>
+<p>How does wait time impact the volume of missed appointments?</p>
 
-<p>So to summarise:</p>
+<figure style="width: 921px">
+  <img src="http://localhost:4000/assets/project_assets/dand-noshows_impact_wait.png" alt="" />
+  <figcaption>Categories of wait-time: same day, 1-2 days, 3-7 days, 8-21days, 22-180 days.</figcaption>
+  </figure>
+
+<p>The majority of all no-shows occur after a wait time longer than a week - while these wait times only make up roughly one-third of the total of appointments.</p>
+
+<h4 id="do-reminders-work">Do reminders work?</h4>
+
+<p>The data set records whether or not an SMS reminder was sent to the patient. Is this linked to the proportion of no-shows?</p>
+
+<p><img src="http://localhost:4000/assets/project_assets/dand-noshows_vs_sms.png" alt="image-right" class="align-center" /></p>
+
+<p>Counterintuitively, more appointments are missed in the category of appointments where an SMS reminder was sent out (27.6%) than those without (16.7%).</p>
+
+<p>How can we make sense of this? Could it be linked to wait time?</p>
+
+<p><img src="http://localhost:4000/assets/project_assets/dand-noshows_sms_disaggregated.png" alt="image-right" class="align-center" /></p>
+
+<p>It turns out that no reminders are sent out for same-day appointments, nor for 1-2 day wait times.</p>
+
+<p>Since no-shows are much lower for these appointments, their amalgamation with longer-wait appointments where no-SMS is sent out reduces the percentage of no-shows when no reminder is sent.</p>
+
+<p>However, in those categories of appointments where they are sent, SMS reminders are associated with significantly lower no-show rates.</p>
+
+<p>This effect is stronger the longer patients wait for their appointment.</p>
+
+<h3 id="patient-characteristics">Patient characteristics</h3>
+<p>The data set also records a number of patient characteristics. To look for associations, I categorised all appointments according to whether the patient had a particular characteristic, and visualised the proportion of no-shows.</p>
+
+<p><img src="http://localhost:4000/assets/project_assets/dand-noshows_vs_characteristics.png" alt="image-right" class="align-center" />
+The proportion of missed appointments is somewhat lower for patients with a disability, with diabetes and with hypertension.</p>
+
+<p>The proportion of missed appointments is somewhat higher for patients in the welfare program <em>Bolsa Família</em> (“scholarship”).</p>
+
+<p>Another variable is patient age. Is it associated with no-show rates?
+<img src="http://localhost:4000/assets/project_assets/dand-noshows_vs_age.png" alt="image-right" class="align-center" /></p>
+
+<p>The lowest proportion of missed appointments is seen in appointments with the very young, and the old ; the highest proportion of missed appointments is seen with teenagers and patients in their early 20s. There’s a steady decline of the proportion of no-shows in appointments with patient age from mid-20s to mid-60s.</p>
+
+<p>How does this affect the volume of missed appointments?</p>
+
+<figure style="width: 921px">
+  <img src="http://localhost:4000/assets/project_assets/dand-noshows_impact_age.png" alt="" />
+  <figcaption>Age categories : infant (0-2 years), child (3-10 years), adolescent(11-17), young adult(18-24), adult(25-44), middle age(45-64), old age(65-115)</figcaption>
+  </figure>
+<p>Although no-shows are disproportionately higher for appointments with children, adolescents, young adults, the impact on the volume of missed appointments is relatively modest, because the bulk of hospital appointments are with patients in the older age categories.</p>
+
+<h3 id="trends-disaggregated-by-hospital">Trends disaggregated by hospital</h3>
+<p>Finally I wanted to check if the associations observed held up if data were divided according to hospital.</p>
+
+<p>More specifically I asked, do hospitals with more frequent SMS reminders have lower no-show rates? Do hospitals with older patients have lower no-show rates?</p>
+
+<figure style="width: 891px">
+  <img src="http://localhost:4000/assets/project_assets/dand-noshows_corr_sms.png" alt="" />
+  </figure>
+
+<p>There is an inverse correlation between the proportion of SMS reminders sent for wait periods over 7 days (and over 21 days) and no-show rates. This means that hospitals with a high no-show rate tend to have a lower proportion of SMS reminders.</p>
+
+<figure style="width: 891px">
+  <img src="http://localhost:4000/assets/project_assets/dand-noshows_corr_age.png" alt="" />
+  </figure>
+
+<p>There is a moderate (r=-0.32) inverse correlation between the proportion of appointments with older patients and no-show rates. This means that hospitals with a higher proportion of older patients tend to have a lower no-show rate.</p>
+
+<p>Conversely there is a moderate (r=0.32) correlation between the proportion of appointments with younger patients (infants are excluded from this group) and no-show rates. This means that hospitals with a higher proportion of younger patients tend to have a higher no-show rate.</p>
+
+<p>In conclusion, variations between hospitals in no-show rates correlate with factors found to be associated with no-shows earlier. No-shows tend to be lower in hospitals that have a higher proportion of SMS reminders, of older patients, and of same-day appointments. No-shows tend to be higher in hospitals that have a higher proportion of younger patients and welfare recipients.</p>
+
+<h4 id="links--files">links &amp; files:</h4>
 <ul>
-  <li>rolling averages are a good way of smoothing out daily variability ;</li>
-  <li>cumulative sums are good for visualising the progression of a dpollen season ;</li>
-  <li>normalisation of cumulative sums is best for comparing season progression and timing - especially in a functional boxplot.</li>
+  <li><a href="http://localhost:4000/assets/project_assets/noshow-hospital-appointments.html">local link</a>: Jupyter notebook</li>
+  <li><a href="https://www.kaggle.com/joniarroba/noshowappointments">noshowappointments-kagglev2-may-2016.csv</a>: original dataset on Kaggle</li>
 </ul>
 
-<p>What if we combine all of these methods from our box of tricks?</p>
-
-<p>Let’s first visualise all the tree pollen seasons:</p>
-
-<p><img src="/assets/image/pollen_season_look_5.png" alt="png" /></p>
-
-<p>That’s daily observations of 20 species over 30 years, so 600 seasons. The daily observations vary over 3 orders of magnitude of pollen concentrations. Quite a muddle!</p>
-
-<p>Now here’s what happens if we separate the same data by plant species, and use rolling means, cumulative normalised sums with functional boxplots.</p>
-
-<p>This way we can visualise when each tree pollen season normally occurs, as well as the seasons that were different from that norm.i87</p>
-
-<p><img src="/assets/image/pollen_season_look_6.png" alt="png" /></p>
-
-<p>And there we have it: order from chaos, an intuitive understanding of 600 tree pollen seasons, 30 years worth of observations made at a daily frequency.</p>
 
   </div>
 
   <div class="date">
-    <i class="fa fa-calendar fa-fw" aria-hidden="true"></i>&nbsp;Date:<span style="color: #333333; font-weight: normal;">&nbsp;November 22, 2021</span>
+    <i class="fa fa-calendar fa-fw" aria-hidden="true"></i>&nbsp;Date:<span style="color: #333333; font-weight: normal;">&nbsp;April 13, 2022</span>
   </div>
 
   <div class="post-categories">
     <i class="fa fa-tags fa-fw" aria-hidden="true"></i>&nbsp;Tags:&nbsp;
-      
-      
-      <a class="categories-button"<a href="/categories/#viz">viz</a>
-      
-      
-      <a class="categories-button"<a href="/categories/#time-series">time-series</a>
-      
-      
-      <a class="categories-button"<a href="/categories/#pollen">pollen</a>
       
       
   </div>
@@ -176,7 +224,7 @@ But pollen concentrations are also vary from season to season. On the right are 
   <div class="share-post">
     <i class="fa fa-share-alt-square fa-fw" aria-hidden="true"></i>&nbsp;Share:&nbsp;
     <!-- Sharingbutton Facebook -->
-<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/" title="Share on Facebook" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="https://facebook.com/sharer/sharer.php?u=http://localhost:4000/projects/noshow-hospital-appointments/" title="Share on Facebook" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--facebook resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z"/></svg>
     </div>
@@ -184,7 +232,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton Twitter -->
-<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?text=What does a pollen season look like?&amp;url=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/" title="Share on Twitter" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="https://twitter.com/intent/tweet/?text=Exploratory data analysis in Python: Missed hospital appointments&amp;url=http://localhost:4000/projects/noshow-hospital-appointments/" title="Share on Twitter" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--twitter resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"/></svg>
     </div>
@@ -192,7 +240,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton Tumblr -->
-<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=What does a pollen season look like?&amp;content=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/&amp;canonicalUrl=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/&amp;shareSource=tumblr_share_button" title="Share on Tumblr" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="https://www.tumblr.com/widgets/share/tool?posttype=link&amp;title=Exploratory data analysis in Python: Missed hospital appointments&amp;content=http://localhost:4000/projects/noshow-hospital-appointments/&amp;canonicalUrl=http://localhost:4000/projects/noshow-hospital-appointments/&amp;shareSource=tumblr_share_button" title="Share on Tumblr" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--tumblr resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.5.5v5h5v4h-5V15c0 5 3.5 4.4 6 2.8v4.4c-6.7 3.2-12 0-12-4.2V9.5h-3V6.7c1-.3 2.2-.7 3-1.3.5-.5 1-1.2 1.4-2 .3-.7.6-1.7.7-3h3.8z"/></svg>
     </div>
@@ -200,7 +248,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton E-Mail -->
-<a class="resp-sharing-button__link" href="mailto:?subject=What does a pollen season look like?&amp;body=Read more at this site http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/" title="Share via E-Mail" target="_self" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="mailto:?subject=Exploratory data analysis in Python: Missed hospital appointments&amp;body=Read more at this site http://localhost:4000/projects/noshow-hospital-appointments/" title="Share via E-Mail" target="_self" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--email resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M22 4H2C.9 4 0 4.9 0 6v12c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM7.25 14.43l-3.5 2c-.08.05-.17.07-.25.07-.17 0-.34-.1-.43-.25-.14-.24-.06-.55.18-.68l3.5-2c.24-.14.55-.06.68.18.14.24.06.55-.18.68zm4.75.07c-.1 0-.2-.03-.27-.08l-8.5-5.5c-.23-.15-.3-.46-.15-.7.15-.22.46-.3.7-.14L12 13.4l8.23-5.32c.23-.15.54-.08.7.15.14.23.07.54-.16.7l-8.5 5.5c-.08.04-.17.07-.27.07zm8.93 1.75c-.1.16-.26.25-.43.25-.08 0-.17-.02-.25-.07l-3.5-2c-.24-.13-.32-.44-.18-.68s.44-.32.68-.18l3.5 2c.24.13.32.44.18.68z"/></svg>
     </div>
@@ -208,7 +256,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton Pinterest -->
-<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/&amp;media=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/&amp;description=What does a pollen season look like?" title="Share on Pinterest" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="https://pinterest.com/pin/create/button/?url=http://localhost:4000/projects/noshow-hospital-appointments/&amp;media=http://localhost:4000/projects/noshow-hospital-appointments/&amp;description=Exploratory data analysis in Python: Missed hospital appointments" title="Share on Pinterest" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--pinterest resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.14.5C5.86.5 2.7 5 2.7 8.75c0 2.27.86 4.3 2.7 5.05.3.12.57 0 .66-.33l.27-1.06c.1-.32.06-.44-.2-.73-.52-.62-.86-1.44-.86-2.6 0-3.33 2.5-6.32 6.5-6.32 3.55 0 5.5 2.17 5.5 5.07 0 3.8-1.7 7.02-4.2 7.02-1.37 0-2.4-1.14-2.07-2.54.4-1.68 1.16-3.48 1.16-4.7 0-1.07-.58-1.98-1.78-1.98-1.4 0-2.55 1.47-2.55 3.42 0 1.25.43 2.1.43 2.1l-1.7 7.2c-.5 2.13-.08 4.75-.04 5 .02.17.22.2.3.1.14-.18 1.82-2.26 2.4-4.33.16-.58.93-3.63.93-3.63.45.88 1.8 1.65 3.22 1.65 4.25 0 7.13-3.87 7.13-9.05C20.5 4.15 17.18.5 12.14.5z"/></svg>
     </div>
@@ -216,7 +264,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton LinkedIn -->
-<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/&amp;title=What does a pollen season look like?&amp;summary=What does a pollen season look like?&amp;source=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/" title="Share on LinkedIn" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://localhost:4000/projects/noshow-hospital-appointments/&amp;title=Exploratory data analysis in Python: Missed hospital appointments&amp;summary=Exploratory data analysis in Python: Missed hospital appointments&amp;source=http://localhost:4000/projects/noshow-hospital-appointments/" title="Share on LinkedIn" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--linkedin resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.5 21.5h-5v-13h5v13zM4 6.5C2.5 6.5 1.5 5.3 1.5 4s1-2.4 2.5-2.4c1.6 0 2.5 1 2.6 2.5 0 1.4-1 2.5-2.6 2.5zm11.5 6c-1 0-2 1-2 2v7h-5v-13h5V10s1.6-1.5 4-1.5c3 0 5 2.2 5 6.3v6.7h-5v-7c0-1-1-2-2-2z"/></svg>
     </div>
@@ -224,7 +272,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton Reddit -->
-<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/&amp;resubmit=true&amp;title=What does a pollen season look like?" title="Share on Reddit" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="https://reddit.com/submit/?url=http://localhost:4000/projects/noshow-hospital-appointments/&amp;resubmit=true&amp;title=Exploratory data analysis in Python: Missed hospital appointments" title="Share on Reddit" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--reddit resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 11.5c0-1.65-1.35-3-3-3-.96 0-1.86.48-2.42 1.24-1.64-1-3.75-1.64-6.07-1.72.08-1.1.4-3.05 1.52-3.7.72-.4 1.73-.24 3 .5C17.2 6.3 18.46 7.5 20 7.5c1.65 0 3-1.35 3-3s-1.35-3-3-3c-1.38 0-2.54.94-2.88 2.22-1.43-.72-2.64-.8-3.6-.25-1.64.94-1.95 3.47-2 4.55-2.33.08-4.45.7-6.1 1.72C4.86 8.98 3.96 8.5 3 8.5c-1.65 0-3 1.35-3 3 0 1.32.84 2.44 2.05 2.84-.03.22-.05.44-.05.66 0 3.86 4.5 7 10 7s10-3.14 10-7c0-.22-.02-.44-.05-.66 1.2-.4 2.05-1.54 2.05-2.84zM2.3 13.37C1.5 13.07 1 12.35 1 11.5c0-1.1.9-2 2-2 .64 0 1.22.32 1.6.82-1.1.85-1.92 1.9-2.3 3.05zm3.7.13c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm9.8 4.8c-1.08.63-2.42.96-3.8.96-1.4 0-2.74-.34-3.8-.95-.24-.13-.32-.44-.2-.68.15-.24.46-.32.7-.18 1.83 1.06 4.76 1.06 6.6 0 .23-.13.53-.05.67.2.14.23.06.54-.18.67zm.2-2.8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm5.7-2.13c-.38-1.16-1.2-2.2-2.3-3.05.38-.5.97-.82 1.6-.82 1.1 0 2 .9 2 2 0 .84-.53 1.57-1.3 1.87z"/></svg>
     </div>
@@ -232,7 +280,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton XING -->
-<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/;title=What does a pollen season look like?" title="Share on XING" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="https://www.xing.com/app/user?op=share;http://localhost:4000/projects/noshow-hospital-appointments/;title=Exploratory data analysis in Python: Missed hospital appointments" title="Share on XING" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--xing resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10.2 9.7l-3-5.4C7.2 4 7 4 6.8 4h-5c-.3 0-.4 0-.5.2v.5L4 10 .4 16v.5c0 .2.2.3.4.3h5c.3 0 .4 0 .5-.2l4-6.6v-.5zM24 .2l-.5-.2H18s-.2 0-.3.3l-8 14v.4l5.2 9c0 .2 0 .3.3.3h5.4s.3 0 .4-.2c.2-.2.2-.4 0-.5l-5-8.8L24 .7V.2z"/></svg>
     </div>
@@ -240,7 +288,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton WhatsApp -->
-<a class="resp-sharing-button__link" href="whatsapp://send?text=What does a pollen season look like?%20http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/" title="Share via WhatsApp" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="whatsapp://send?text=Exploratory data analysis in Python: Missed hospital appointments%20http://localhost:4000/projects/noshow-hospital-appointments/" title="Share via WhatsApp" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--whatsapp resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.1 3.9C17.9 1.7 15 .5 12 .5 5.8.5.7 5.6.7 11.9c0 2 .5 3.9 1.5 5.6L.6 23.4l6-1.6c1.6.9 3.5 1.3 5.4 1.3 6.3 0 11.4-5.1 11.4-11.4-.1-2.8-1.2-5.7-3.3-7.8zM12 21.4c-1.7 0-3.3-.5-4.8-1.3l-.4-.2-3.5 1 1-3.4L4 17c-1-1.5-1.4-3.2-1.4-5.1 0-5.2 4.2-9.4 9.4-9.4 2.5 0 4.9 1 6.7 2.8 1.8 1.8 2.8 4.2 2.8 6.7-.1 5.2-4.3 9.4-9.5 9.4zm5.1-7.1c-.3-.1-1.7-.9-1.9-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1s-1.2-.5-2.3-1.4c-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6s.3-.3.4-.5c.2-.1.3-.3.4-.5.1-.2 0-.4 0-.5C10 9 9.3 7.6 9 7c-.1-.4-.4-.3-.5-.3h-.6s-.4.1-.7.3c-.3.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.3-.3-.4-.6-.5z"/></svg>
     </div>
@@ -248,7 +296,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton Hacker News -->
-<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/&amp;t=What does a pollen season look like?" title="Share on Hacker News" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="https://news.ycombinator.com/submitlink?u=http://localhost:4000/projects/noshow-hospital-appointments/&amp;t=Exploratory data analysis in Python: Missed hospital appointments" title="Share on Hacker News" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--hackernews resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><path fill-rule="evenodd" d="M60.94 82.314L17 0h20.08l25.85 52.093c.397.927.86 1.888 1.39 2.883.53.994.995 2.02 1.393 3.08.265.4.463.764.596 1.095.13.334.262.63.395.898.662 1.325 1.26 2.618 1.79 3.877.53 1.26.993 2.42 1.39 3.48 1.06-2.254 2.22-4.673 3.48-7.258 1.26-2.585 2.552-5.27 3.877-8.052L103.49 0h18.69L77.84 83.308v53.087h-16.9v-54.08z"></path></svg>
     </div>
@@ -256,7 +304,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton VK -->
-<a class="resp-sharing-button__link" href="http://vk.com/share.php?title=What does a pollen season look like?&amp;url=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/" title="Share on VK" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="http://vk.com/share.php?title=Exploratory data analysis in Python: Missed hospital appointments&amp;url=http://localhost:4000/projects/noshow-hospital-appointments/" title="Share on VK" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--vk resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.547 7h-3.29a.743.743 0 0 0-.655.392s-1.312 2.416-1.734 3.23C14.734 12.813 14 12.126 14 11.11V7.603A1.104 1.104 0 0 0 12.896 6.5h-2.474a1.982 1.982 0 0 0-1.75.813s1.255-.204 1.255 1.49c0 .42.022 1.626.04 2.64a.73.73 0 0 1-1.272.503 21.54 21.54 0 0 1-2.498-4.543.693.693 0 0 0-.63-.403h-2.99a.508.508 0 0 0-.48.685C3.005 10.175 6.918 18 11.38 18h1.878a.742.742 0 0 0 .742-.742v-1.135a.73.73 0 0 1 1.23-.53l2.247 2.112a1.09 1.09 0 0 0 .746.295h2.953c1.424 0 1.424-.988.647-1.753-.546-.538-2.518-2.617-2.518-2.617a1.02 1.02 0 0 1-.078-1.323c.637-.84 1.68-2.212 2.122-2.8.603-.804 1.697-2.507.197-2.507z"/></svg>
     </div>
@@ -264,7 +312,7 @@ But pollen concentrations are also vary from season to season. On the right are 
 </a>
 
 <!-- Sharingbutton Telegram -->
-<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=What does a pollen season look like?&amp;url=http://localhost:4000/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/" title="Share via Telegram" target="_blank" rel="noopener" aria-label="">
+<a class="resp-sharing-button__link" href="https://telegram.me/share/url?text=Exploratory data analysis in Python: Missed hospital appointments&amp;url=http://localhost:4000/projects/noshow-hospital-appointments/" title="Share via Telegram" target="_blank" rel="noopener" aria-label="">
   <div class="resp-sharing-button resp-sharing-button--telegram resp-sharing-button--small"><div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M.707 8.475C.275 8.64 0 9.508 0 9.508s.284.867.718 1.03l5.09 1.897 1.986 6.38a1.102 1.102 0 0 0 1.75.527l2.96-2.41a.405.405 0 0 1 .494-.013l5.34 3.87a1.1 1.1 0 0 0 1.046.135 1.1 1.1 0 0 0 .682-.803l3.91-18.795A1.102 1.102 0 0 0 22.5.075L.706 8.475z"/></svg>
     </div>
@@ -320,24 +368,77 @@ But pollen concentrations are also vary from season to season. On the right are 
 
   
   
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+
+  
+
+  
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+
+  
+
+  
+    
     
   
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
+  
+    
+    
   
 
-  
-  
-
-  
-
-  
-
-  
-  
-
 
 
 
   
+    
+    
+    
+
+    
     <div class="related-posts-post">
   <a href="/pollen/mast%20seeding/evolution/2021/11/29/squirrels/">
     How hazel trees stop squirrels eating all the hazel nuts, using auto-correlation in pollen
@@ -345,10 +446,12 @@ But pollen concentrations are also vary from season to season. On the right are 
 </div>
 
 
+  
     
-  
+    
+    
 
-  
+    
     <div class="related-posts-post">
   <a href="/pollen/data%20cleaning/2021/11/23/Data-cleaning-how-to-find-needle-haystack/">
     How to find a needle in the haystack, using z-scores and Q-Q plots
@@ -356,29 +459,24 @@ But pollen concentrations are also vary from season to season. On the right are 
 </div>
 
 
+  
     
-  
+    
+    
 
-  
-
-  
+    
     <div class="related-posts-post">
-  <a href="/pollen/2021/11/15/Looking-at-Pollen/">
-    A lockdown project that became something bigger
+  <a href="/viz/time-series/pollen/2021/11/22/How-to-visualise-pollen-seasons/">
+    What does a pollen season look like?
   </a>
 </div>
 
 
-    
   
-
-
-
-
-
-
-
-
+    
+    
+    
+      
 
 
 </div>
@@ -390,13 +488,13 @@ But pollen concentrations are also vary from season to season. On the right are 
   <p>
     
     <span class="post-nav-label">Previous</span><br>
-    <a href="/pollen/2021/11/15/Looking-at-Pollen/">&#9194;&nbsp;A lockdown project that became something bigger</a>
+    <a href="/projects/US-campaign-donations-2016/">&#9194;&nbsp;Exploratory Data Analysis in R: US presidential campaign donations 2016</a>
     
   </p>
   <p>
     
     <span class="post-nav-label">Next</span><br>
-    <a href="/pollen/data%20cleaning/2021/11/23/Data-cleaning-how-to-find-needle-haystack/">How to find a needle in the haystack, using z-scores and Q-Q plots&nbsp;&#9193;</a>
+    <a href="/projects/tableau_prosper/">Data visualisation: P2P lending and the credit crunch&nbsp;&#9193;</a>
     
   </p>
 </div>
